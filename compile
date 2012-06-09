@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+echo "var Opal = require('opal').Opal;$(opal app.opal)" > app.js
