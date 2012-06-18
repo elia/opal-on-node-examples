@@ -13,15 +13,17 @@ class Buble
     end
   
     def process request
-      action = nil
+      route, action = nil, nil
       method = `request.method`.downcase
+      path = `request.url`
       routes(method).each do |route_and_action|
         route = route_and_action.first
-        if route =~ `request.url`
+        if route =~ path
           action = route_and_action.last
           break
         end
       end
+      puts "\nProcessing #{path.inspect} with #{route.inspect}"
       action.call(request)
     end
   
