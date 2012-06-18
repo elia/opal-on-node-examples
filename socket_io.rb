@@ -15,8 +15,9 @@ module Socket
   def on key, &block
     %x{
       var _this = this;
+      console.log(_this);
       #{socket}.on(#{key}, function(){
-        block.call(_this)
+        block.apply(_this)
       });
     }
     
@@ -29,5 +30,12 @@ module Socket
   def start &block
     on :connection, &block
   end
+  
+  def _hash_to_object hash
+    object = `{}`
+    hash.each_pair do |k,v|
+      `object[#{k.to_s}] = #{v};`
+    end
+    return object
+  end
 end
-puts 'ciao'
