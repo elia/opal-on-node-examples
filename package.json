@@ -1,0 +1,11 @@
+{
+  "name": "IRC",
+  "version": "0.0.1",
+  "dependencies": {
+    "opal": "latest",
+    "socket.io": "latest"
+  },
+  "engines": {
+    "node": "0.6.x"
+  }
+}
