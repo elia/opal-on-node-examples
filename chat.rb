@@ -17,20 +17,26 @@ server.get(/.*/) do |resp|
     <body>
       <input type="text" name="nick" id='nick' placeholder='your nickname!'/>
       <dl id='messages'></dl>
-      <input type="text" name="message" id='message' placeholder='chat!'/>
+      <form><input type="text" name="message" id='message' placeholder='chat!'/></form>
       <a href='#' id='send_message'>Send</a>
       
       <script>
         var socket = io.connect('http://localhost:3000');
         socket.on('message', function (data) {
           console.log('message', data)
-          $('#messages').append( $('<dd>'+data.text+'</dd>') )
+          $('#messages').append( $('<dt>'+data.nick+'</dt><dd>'+data.text+'</dd>') )
         });
         
-        $('#send_message').click(function() {
+        socket.on('status', function (data) {
+          console.log('STATUS', data)
+        });
+        
+        $('form').submit(function(event) {
           var text = $('#message')[0].value
           var nick = $('#nick')[0].value
           socket.emit('message.new', {nick: nick, text: text})
+          $('#message')[0].value = ''
+          event.preventDefault()
         });
       </script>
       
@@ -43,7 +49,7 @@ server.start!
 
 
 Socket.io server.server do
-  emit :message, {text: 'Connected'}
+  emit :status, 'Connected!'
   
   on 'message.new' do |data|
     emit :message, data
