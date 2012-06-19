@@ -23,8 +23,14 @@ class Buble
           break
         end
       end
-      puts "\nProcessing #{path.inspect} with #{route.inspect}"
-      action.call(request)
+      if action
+        puts "\nProcessing #{path.inspect} with #{route.inspect}"
+        `action._s = this`
+        action.call(request)
+      else
+        @status = 404
+        "Page not found - (Error 404)"
+      end
     end
   
     def routes method
