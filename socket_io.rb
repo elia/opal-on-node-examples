@@ -11,13 +11,7 @@ module Socket
   end
   
   def emit key, data
-    # `console.log('EMIT', this)`
-    if `data._id` and data.is_a? Hash
-      `console.log('HASH', true, data)`
-      `console.log("changing", data, " to:", #{data.to_object});`
-      data = data.to_object
-    end
-    `console.log('TEXT', data)`
+    data = data.to_object if `data._klass == #{Hash}`
     `this.socket.emit(key, data)`
   end
   

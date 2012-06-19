@@ -1,6 +1,4 @@
 require 'core_ext'
-
-# puts OPAL_SOURCE
 require 'socket_io'
 require 'buble'
 
@@ -17,6 +15,7 @@ server.get(/.*/) do |resp|
       <!--<script># {OPAL_SOURCE}</script>-->
     </head>
     <body>
+      <input type="text" name="nick" id='nick' placeholder='your nickname!'/>
       <dl id='messages'></dl>
       <input type="text" name="message" id='message' placeholder='chat!'/>
       <a href='#' id='send_message'>Send</a>
@@ -30,8 +29,8 @@ server.get(/.*/) do |resp|
         
         $('#send_message').click(function() {
           var text = $('#message')[0].value
-          console.log('sending: message.new', text)
-          socket.emit('message.new', {text: text})
+          var nick = $('#nick')[0].value
+          socket.emit('message.new', {nick: nick, text: text})
         });
       </script>
       
@@ -47,7 +46,6 @@ Socket.io server.server do
   emit :message, {text: 'Connected'}
   
   on 'message.new' do |data|
-    `console.log('REC',data)`
     emit :message, data
   end
 end
