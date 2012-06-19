@@ -1,41 +1,48 @@
+require 'hash_to_object'
+
 module Socket
-  def self.io port, &block
-    new(port).start(&block)
+  def self.io port_or_server, &block
+    new(port_or_server).start(&block)
   end
   
   def initialize port_or_server
     @port_or_server = port_or_server
+    @io = `require('socket.io').listen(this.port_or_server)`
   end
   
   def emit key, data
-    data = _hash_to_object(data)
-    `#{socket}.emit(key, data)`
+    # `console.log('EMIT', this)`
+    if `data._id` and data.is_a? Hash
+      `console.log('HASH', true, data)`
+      `console.log("changing", data, " to:", #{data.to_object});`
+      data = data.to_object
+    end
+    `console.log('TEXT', data)`
+    `this.socket.emit(key, data)`
   end
   
   def on key, &block
     %x{
       var _this = this;
-      console.log(_this);
-      #{socket}.on(#{key}, function(){
-        block.apply(_this)
+      #{@socket}.on(#{key}, function(data){
+        block.apply(_this, [data])
       });
     }
-    
   end
   
-  def socket
-    @socket ||= `require('socket.io').listen(this.port_or_server)`
-  end
+  attr_reader :socket, :io
   
   def start &block
-    on :connection, &block
+    @socket = nil
+    %x{
+      block._s = this;
+      var _this = this;
+      
+      this.io.sockets.on('connection', function(socket){
+        _this.socket = socket;
+        #{block.call}
+      });
+    }
   end
   
-  def _hash_to_object hash
-    object = `{}`
-    hash.each_pair do |k,v|
-      `object[#{k.to_s}] = #{v};`
-    end
-    return object
-  end
 end

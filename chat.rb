@@ -13,25 +13,28 @@ server.get(/.*/) do |resp|
     <head>
       <title>Ahoy!</title>
       <script src="/socket.io/socket.io.js"></script>
-      <script>#{OPAL_SOURCE}</script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+      <!--<script># {OPAL_SOURCE}</script>-->
+    </head>
+    <body>
+      <dl id='messages'></dl>
+      <input type="text" name="message" id='message' placeholder='chat!'/>
+      <a href='#' id='send_message'>Send</a>
+      
       <script>
         var socket = io.connect('http://localhost:3000');
         socket.on('message', function (data) {
-          document.getElementById('messages').innerHTML += '<li>'+data.text+'</li>';
+          console.log('message', data)
+          $('#messages').append( $('<dd>'+data.text+'</dd>') )
         });
-        function send_message() {
-          var text = document.getElementById('message').value
-          socket.emit('message', {text: text})
-          console.log()
-        }
         
+        $('#send_message').click(function() {
+          var text = $('#message')[0].value
+          console.log('sending: message.new', text)
+          socket.emit('message.new', {text: text})
+        });
       </script>
-    </head>
-    <body>
-      <dl id='messages'/>
-      <form method='post' onsubmit='send_message();return false;'>
-        <input type="text" name="message" id='message' placeholder='chat!'/>
-      </form>
+      
     </body>
   </html>
   HTML_
@@ -39,14 +42,12 @@ end
 
 server.start!
 
+
 Socket.io server.server do
-  # on connection
+  emit :message, {text: 'Connected'}
   
-  emit :message, {text: 'hello world'}
-  
-  on :message do |data|
-    `console.log(this)`
-    puts data
+  on 'message.new' do |data|
+    `console.log('REC',data)`
     emit :message, data
   end
 end
