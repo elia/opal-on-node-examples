@@ -13,7 +13,7 @@
     </style>
   </head>
   <body>
-    <h1>IRC - InteractiveRubyChat</h1>
+    <!-- <h1>IRC - InteractiveRubyChat</h1> -->
     <dl id='messages'></dl>
     <form>
       <input type="text" name="nick" id='nick' placeholder='your nickname!'/>
@@ -22,7 +22,10 @@
     </form>
       
     <script>
-      var socket = io.connect('http://localhost:3000');
+      var socket, nick;
+      
+      socket = io.connect('http://localhost:3000');
+      
       socket.on('message', function (data) {
         console.log('message', data)
         $('#messages').append( $('<dt/>').text(data.nick+':'), $('<dd/>').text(data.text) )
@@ -32,9 +35,12 @@
         console.log('STATUS', data)
       });
       
-      var nick = $('#nick').val(sessionStorage.nick)
       
       try {sessionStorage} catch(e) { var sessionStorage = {} }
+      
+      nick = $('#nick')
+      nick.val(sessionStorage.nick)
+      if (nick.val() !== '') socket.emit('connected', {nick: nick.val()})
         
       $('form').submit(function(event) {
         var message, text, nick;

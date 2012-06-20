@@ -23,5 +23,9 @@ Socket.io server.server do
   on 'message.new' do |data|
     broadcast :message, data
   end
+  
+  on :connected do |data|
+    broadcast :message, text: "#{`data.nick`} connected", nick: '<system>'
+  end
 end
 
