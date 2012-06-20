@@ -24,7 +24,7 @@
     <script>
       var socket, nick;
       
-      socket = io.connect('http://localhost:3000');
+      socket = io.connect(window.location.href);
       
       socket.on('message', function (data) {
         console.log('message', data)
