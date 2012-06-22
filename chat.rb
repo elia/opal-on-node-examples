@@ -4,6 +4,11 @@ require 'buble'
 
 server = Buble.new 3000
 
+server.get(/^\/opal\/opal.js$/) do |request|
+  @headers['Content-Type'] = 'application/javascript'
+  return OPAL_SOURCE
+end
+
 server.get(/^\/$/) do |request|
   #{require_client('socket_client')}
   File.read('./chat.html')
