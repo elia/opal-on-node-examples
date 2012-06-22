@@ -40,7 +40,9 @@
       
       nick = $('#nick')
       nick.val(sessionStorage.nick)
-      if (nick.val() !== '') socket.emit('connected', {nick: nick.val()})
+      nick.broadcast = function() { if (nick.val() !== '') socket.emit('connected', {nick: nick.val()}) }
+      nick.broadcast()
+      nick.blur(function() { nick.broadcast() })
         
       $('form').submit(function(event) {
         var message, text, nick;
