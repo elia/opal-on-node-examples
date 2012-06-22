@@ -15,6 +15,12 @@ module Socket
     `this.socket.emit(key, data)`
   end
   
+  def broadcast key, data
+    data = data.to_object if `data._klass == #{Hash}`
+    `this.socket.emit(key, data)`
+    `this.socket.broadcast.emit(key, data)`
+  end
+  
   def on key, &block
     %x{
       var _this = this;

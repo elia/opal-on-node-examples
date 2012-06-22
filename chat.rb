@@ -21,7 +21,7 @@ Socket.io server.server do
   emit :status, 'Connected!'
   
   on 'message.new' do |data|
-    emit :message, data
+    broadcast :message, data
   end
 end
 
