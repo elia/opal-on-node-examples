@@ -1,3 +1,5 @@
+require 'hash_to_object'
+
 class Buble
   module Sinatra
     def get regexp, &action
@@ -47,16 +49,20 @@ class Buble
   end
   
   def start &block
+    `var _this = this`
     @server = %x{
       this.http.createServer(function(req, res) {
-        var body = "";
+        var body = '';
         req.on('data', function (chunk) {
           body += chunk;
         });
         req.on('end', function(){
           req.body = body
-          var rackResponse = (block.call(block._s, req, res));
-          res.end(rackResponse[2].join(' '));
+          var rackResponse = (block.apply(_this, [req, res]))
+          console.log('STATUS', _this.status)
+          console.log('HEADERS', _this.headers.$to_object())
+          res.writeHead(_this.status, _this.headers.$to_object())
+          res.end(rackResponse[2].join(' '))
         });
       })
     }
@@ -67,7 +73,10 @@ class Buble
   def start!
     puts "Starting Buble server on port #{@port}"
     start do |request|
-      [200, {'Content-Type' => 'text/plain'}, [process(request)]]
+      @status = 200
+      @headers = {'Content-Type' => 'text/html'}
+      @body = Array(process(request))
+      [@status, @headers, @body]
     end
   end
   
